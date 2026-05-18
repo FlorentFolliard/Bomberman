@@ -1,4 +1,4 @@
-#include "../../include/input.h"
+#include "../include/input.h"
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
