@@ -39,15 +39,19 @@ int main() {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(DEFAULT_PORT);
 
-    // Conversion de l'adresse IP de texte à binaire
-    if ( some_name_or_inet_pton(AF_INET, server_ip, &serv_addr.sin_addr) <= 0 ) {
-        // Fallback si inet_pton pose problème selon la version du compilateur
-        serv_addr.sin_addr.s_addr = inet_addr(server_ip);
+    // 3. Conversion de l'adresse IP (Version corrigée)
+    serv_addr.sin_addr.s_addr = inet_addr(server_ip);
+    if (serv_addr.sin_addr.s_addr == INADDR_NONE) {
+        printf("Format de l'adresse IP invalide.\n");
+        closesocket(sock);
+        WSACleanup();
+        system("pause");
+        return 1;
     }
 
     printf("\nTentative de connexion à %s:%d...\n", server_ip, DEFAULT_PORT);
 
-    // 3. Connexion au serveur
+    // 4. Connexion au serveur
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == SOCKET_ERROR) {
         printf("CONNEXION ÉCHOUÉE ! Vérifiez l'IP, le switch ou le Pare-feu Windows.\n");
         closesocket(sock);
@@ -58,11 +62,11 @@ int main() {
 
     printf("[SUCCÈS] Connecté au serveur !\n");
 
-    // 4. Envoi du paquet de test
+    // 5. Envoi du paquet de test
     send(sock, (char *)&packet, sizeof(TestPacket), 0);
     printf("[ENVOI] Message envoyé au serveur.\n");
 
-    // 5. Attente de la réponse du serveur
+    // 6. Attente de la réponse du serveur
     int bytes_received = recv(sock, (char *)&packet, sizeof(TestPacket), 0);
     if (bytes_received > 0) {
         printf("[RÉPONSE DU SERVEUR] : \"%s\"\n", packet.message);
