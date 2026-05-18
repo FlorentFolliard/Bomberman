@@ -71,8 +71,6 @@ InputState input_get_state(void) {
                 break;
             
             case 27:   /* Échap pour quitter */
-            case 'q':
-            case 'Q':
                 state.quit_requested = 1;
                 break;
             
